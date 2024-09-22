@@ -1,0 +1,3 @@
+rootProject.name = 'nasa-openapi-svc'
+include 'nasa-service'
+include 'nasa-api'
