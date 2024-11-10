@@ -54,9 +54,6 @@ public class PicOfDayService implements IPicOfDayService{
         
         System.out.println("Entity id is "+ picOfDay.getId());
         return picOfDay;
-//        return ResponseEntity.status(response.getStatusCode())
-//        		.contentType(MediaType.APPLICATION_JSON)
-//        		.body(response.getBody());
 		
 	}
 

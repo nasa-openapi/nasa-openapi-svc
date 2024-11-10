@@ -3,10 +3,6 @@ plugins {
     id "io.freefair.lombok" version "8.10.2"
 }
 
-repositories {
-        mavenCentral()  // Add mavenCentral() here
-}
-
 
 java {
     toolchain {
@@ -24,7 +20,7 @@ subprojects {
     
 
     repositories {
-        mavenCentral()  // Add mavenCentral() here
+        mavenCentral()  
     }
 
     tasks.named('test') {
