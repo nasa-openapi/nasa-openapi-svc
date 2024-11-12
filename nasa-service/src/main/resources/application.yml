@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: nasa-openapi-svc
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  jpa:
+    hibernate:
+      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  flyway:
+    locations: classpath:/db/migration
+    schemas: NasaDB
+    baselineOnMigrate: true
+    enabled: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/NasaDB?currentSchema=NasaDB
+    username: postgres
+    password: password
