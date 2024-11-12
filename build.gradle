@@ -1,8 +1,7 @@
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "8.10.2"
+    id 'io.freefair.lombok' version '8.10.2'
 }
-
 
 java {
     toolchain {
@@ -10,25 +9,26 @@ java {
     }
 }
 
+allprojects{
+	repositories {
+    	mavenCentral()
+    }
+    
+   
+}
 subprojects {
-
-	group = 'com.nasa-openapi'
-	version = '0.0.1-SNAPSHOT'
+    group = 'com.nasa-openapi'
+    version = '0.0.1-SNAPSHOT'
     
     apply plugin: 'java'
-    apply plugin: "io.freefair.lombok"
+    apply plugin: 'io.freefair.lombok'
+
     
-
-    repositories {
-        mavenCentral()  
-    }
-
+	dependencies{
+		    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+	}
     tasks.named('test') {
         useJUnitPlatform()
-    }
-
-    dependencies {
-    	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.0'
     }
 }

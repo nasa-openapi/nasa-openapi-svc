@@ -1,0 +1,10 @@
+# application-test.yaml
+spring:
+    config:
+        activate:
+            on-profile: test
+    datasource:
+      url: jdbc:h2:mem:testdb
+      driverClassName: org.h2.Driver
+      username: sa
+      password: password  

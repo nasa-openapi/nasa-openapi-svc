@@ -15,6 +15,8 @@ public class DateUtil {
 		
         // Define the date format that matches the input string
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        // Set lenient to false to enforce strict parsing
+        formatter.setLenient(false);
         Date date = null;
         try {
             // Parse the string into a Date object
@@ -23,7 +25,7 @@ public class DateUtil {
             // Output the Date object
             System.out.println("Converted Date: " + date);
         } catch (ParseException e) {
-            e.printStackTrace(); // Handle parsing error
+            throw new IllegalArgumentException("Invalid value for date");
         }
         
         return date;
