@@ -24,6 +24,9 @@ jobs:
           distribution: 'temurin'
           architecture: x64
 
+      - name: Grant execute permissions for Gradle Wrapper
+        run: chmod +x gradlew
+
       - name: Run Gradle Build
         run: ./gradlew build
 
