@@ -1,5 +1,5 @@
 name: Continuous Integration
-run-name: Integrate and Test changes
+run-name: Intergrate, Build and Test changes
 
 on:
   push:
