@@ -4,10 +4,10 @@ run-name: Intergrate, Build and Test changes
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
