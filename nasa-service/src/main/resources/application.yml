@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
   application:
     name: nasa-openapi-svc
   jackson:
@@ -13,6 +15,6 @@ spring:
     enabled: true
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/NasaDB?currentSchema=NasaDB
-    username: postgres
-    password: password
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/NasaDB?currentSchema=NasaDB}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}

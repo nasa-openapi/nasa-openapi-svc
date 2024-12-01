@@ -32,3 +32,6 @@ subprojects {
         useJUnitPlatform()
     }
 }
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
