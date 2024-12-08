@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -jar target/nasa-openapi-svc-0.0.1-SNAPSHOT.jar
