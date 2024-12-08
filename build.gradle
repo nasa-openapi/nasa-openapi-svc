@@ -50,7 +50,7 @@ task copyJar(type: Copy) {
         include 'nasa-service-0.0.1-SNAPSHOT.jar' // Adjust if your jar name format differs
     }
     into 'build/libs' 
-    rename('nasa-service-0.0.1-SNAPSHOT.jar', 'nasa-openapi-svc.jar'
+    rename('nasa-service-0.0.1-SNAPSHOT.jar', 'nasa-openapi-svc.jar')
 }
 
 // Ensure the build task runs after cleaning
