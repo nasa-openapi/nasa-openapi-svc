@@ -33,5 +33,25 @@ subprojects {
     }
 }
 
-task stage(dependsOn: ['build', 'clean'])
+// Task to clean, build, and package the app for Heroku
+task stage(dependsOn: ['clean', 'build', 'copyJar']) {
+    group = 'build'
+    description = 'Prepares the application for deployment'
+}
+
+// Task to copy the jar from the service folder to a top-level directory for Heroku
+task copyJar(type: Copy) {
+    group = 'build'
+    description = 'Copies the jar to the build directory for deployment'
+
+    dependsOn ':nasa-service:build' 
+
+    from('nasa-service/build/libs') {
+        include 'nasa-service-0.0.1-SNAPSHOT.jar' // Adjust if your jar name format differs
+    }
+    into 'build/libs' 
+    rename('nasa-service-0.0.1-SNAPSHOT.jar', 'nasa-openapi-svc.jar')
+}
+
+// Ensure the build task runs after cleaning
 build.mustRunAfter clean
