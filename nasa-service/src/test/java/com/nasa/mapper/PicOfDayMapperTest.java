@@ -8,8 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.nasa.bean.PicOfDayBean;
 import com.nasa.entity.PicOfDayEntity;
 
-@SpringBootTest
-@ActiveProfiles("test")
+//@SpringBootTest
+//@ActiveProfiles("test")
 public class PicOfDayMapperTest {
 	
 	PicOfDayMapper cut = new PicOfDayMapper();
