@@ -22,7 +22,6 @@ public class GlobalExceptionHandler {
                 body(responseBean);
     }
     
-    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseBean> handleIllegalArgumentException(IllegalArgumentException ex) {
         ErrorResponseBean responseBean = ErrorResponseBean.builder().message(ex.getMessage())
