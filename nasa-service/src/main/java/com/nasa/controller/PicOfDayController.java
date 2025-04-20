@@ -24,6 +24,12 @@ import com.nasa.exception.ResourceNotFoundException;
 import com.nasa.mapper.PicOfDayResposeMapper;
 import com.nasa.service.IPicOfDayService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/nasa/v1/picOfDay")
 public class PicOfDayController {
@@ -36,7 +42,12 @@ public class PicOfDayController {
 	
 	PicOfDayResposeMapper responseMapper = new PicOfDayResposeMapper();
 	
-	
+	@Operation(summary = "Get Pic of Day for a givem day")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "For a given date param, return pic of day and its details",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PicOfDayEntity.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content)
+    })
 	@GetMapping("/getPicForDay")
 	public ResponseEntity<PicOfDayResponseBean> todaysPic(@RequestParam  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
 		PicOfDayEntity entity =  picOfDayService.getPicByDate(date);
@@ -49,6 +60,13 @@ public class PicOfDayController {
         		.body(responseBean);
 	}
 	
+	@Operation(summary = "Save Pic for today")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "This API fetches the current day's pic from NASA"
+            		+ " and persists in the database. To be replaced by a cron job later",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PicOfDayEntity.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content)
+    })
 	@GetMapping("/saveTodaysPic")
 	public ResponseEntity<PicOfDayResponseBean> saveTodaysPic(){
 		PicOfDayEntity entity =picOfDayService.fetchTodaysPic();
