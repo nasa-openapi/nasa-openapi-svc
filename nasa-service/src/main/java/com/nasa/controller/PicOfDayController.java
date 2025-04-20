@@ -1,13 +1,19 @@
 package com.nasa.controller;
 
-import java.util.Date;
-
+import com.nasa.bean.ErrorResponseBean;
+import com.nasa.bean.PicOfDayResponseBean;
+import com.nasa.entity.PicOfDayEntity;
+import com.nasa.exception.ResourceNotFoundException;
+import com.nasa.mapper.PicOfDayResposeMapper;
+import com.nasa.service.IPicOfDayService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.nasa.bean.PicOfDayBean;
-import com.nasa.bean.PicOfDayResponseBean;
-import com.nasa.entity.PicOfDayEntity;
-import com.nasa.exception.ResourceNotFoundException;
-import com.nasa.mapper.PicOfDayResposeMapper;
-import com.nasa.service.IPicOfDayService;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/nasa/v1/picOfDay")
@@ -36,7 +37,13 @@ public class PicOfDayController {
 	
 	PicOfDayResposeMapper responseMapper = new PicOfDayResposeMapper();
 	
-	
+	@Operation(summary = "Get Pic of Day for a given day")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "For a given date param, return pic of day and its details",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PicOfDayResponseBean.class))}),
+            @ApiResponse(responseCode = "404", description = "Invalid request",
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseBean.class))})
+    })
 	@GetMapping("/getPicForDay")
 	public ResponseEntity<PicOfDayResponseBean> todaysPic(@RequestParam  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
 		PicOfDayEntity entity =  picOfDayService.getPicByDate(date);
@@ -49,6 +56,14 @@ public class PicOfDayController {
         		.body(responseBean);
 	}
 	
+	@Operation(summary = "Save Pic for today")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "This API fetches the current day's pic from NASA"
+            		+ " and persists in the database. To be replaced by a cron job later",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PicOfDayResponseBean.class))}),
+            @ApiResponse(responseCode = "500", description = "Internal Error",
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseBean.class))})
+    })
 	@GetMapping("/saveTodaysPic")
 	public ResponseEntity<PicOfDayResponseBean> saveTodaysPic(){
 		PicOfDayEntity entity =picOfDayService.fetchTodaysPic();
@@ -58,7 +73,17 @@ public class PicOfDayController {
         		.body(responseBean);
 			
 	}
-	
+
+	@Operation(summary = "Get today's Astronomy Picture of the Day")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Successfully retrieved today's picture",
+					content = @Content(
+							mediaType = "application/json",
+							schema = @Schema(implementation = PicOfDayResponseBean.class)
+					)),
+			@ApiResponse(responseCode = "404", description = "Picture for today not found",
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponseBean.class))})
+	})
 	@GetMapping("/getTodaysPic")
 	public ResponseEntity<PicOfDayResponseBean> getTodaysPic(){
 		PicOfDayEntity entity = picOfDayService.getTodaysPic();
