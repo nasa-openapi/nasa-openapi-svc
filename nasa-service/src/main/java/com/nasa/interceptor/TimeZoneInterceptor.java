@@ -13,14 +13,7 @@ public class TimeZoneInterceptor implements HandlerInterceptor {
         // Retrieve the timezone from the request header (you can also use parameters or cookies)
         String timezone = request.getHeader("X-Timezone");
         System.out.println("Time zone is :"+ timezone);
-        if (timezone != null && !timezone.isEmpty()) {
-            // Set the timezone in the ThreadLocal
             TimeZoneContext.setTimezone(timezone);
-        } else {
-            // Set default timezone or handle accordingly
-        	TimeZoneContext.setTimezone("UTC");
-        }
-        
         return true; // Continue the request
     }
 

@@ -1,5 +1,7 @@
 package com.nasa.util;
 
+import java.util.Optional;
+
 public class TimeZoneContext {
     private static final ThreadLocal<String> timezoneContext = new ThreadLocal<>();
 
@@ -8,7 +10,7 @@ public class TimeZoneContext {
     }
 
     public static String getTimezone() {
-        return timezoneContext.get();
+        return Optional.ofNullable(timezoneContext.get()).orElse("UTC");
     }
 
     public static void clear() {
