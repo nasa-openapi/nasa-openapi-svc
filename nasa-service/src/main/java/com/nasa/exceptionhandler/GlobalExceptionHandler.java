@@ -1,6 +1,7 @@
 package com.nasa.exceptionhandler;
 
 import com.nasa.bean.ErrorResponseBean;
+import com.nasa.exception.PicOfDayServiceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,15 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now().toString())
                 .status(HttpStatus.BAD_REQUEST.value()).build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).
+                body(responseBean);
+    }
+
+    @ExceptionHandler(PicOfDayServiceException.class)
+    public ResponseEntity<ErrorResponseBean> handlePicOfDayServiceException(PicOfDayServiceException ex){
+        ErrorResponseBean responseBean = ErrorResponseBean.builder().message("Currently unavailable. Please Try another time.")
+                .timestamp(LocalDateTime.now().toString())
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value()).build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).contentType(MediaType.APPLICATION_JSON).
                 body(responseBean);
     }
 }
