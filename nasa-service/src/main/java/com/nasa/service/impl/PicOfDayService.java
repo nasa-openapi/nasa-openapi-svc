@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,8 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Date;
+import java.util.Optional;
 
 import static com.nasa.constants.PicOfDayConstants.*;
 
@@ -41,31 +45,36 @@ public class PicOfDayService implements IPicOfDayService{
 	RestTemplate client;
 
 	@Override
-	public PicOfDayEntity fetchTodaysPic() {
-		StringBuilder url = new StringBuilder();
-		url.append(NASA_URL)
-			.append(PLANETARY_PIC_OF_DAY_API)
-			.append("?")
-			.append("api_key=")
-			.append(API_KEY);
-		
+	public PicOfDayEntity fetchTodaysPic() throws DataAccessException {
+		PicOfDayEntity picOfDay = callNasaApi();
+		return picOfDayRepository.save(picOfDay);
+	}
+
+	private PicOfDayEntity callNasaApi(){
+
+		URI uri = UriComponentsBuilder.fromHttpUrl(NASA_URL)
+				.path(PLANETARY_PIC_OF_DAY_API)
+				.queryParam("api_key", API_KEY)
+				.build().toUri();
+
 		HttpHeaders headers = new HttpHeaders();
-        HttpEntity<?> entity = new HttpEntity<>(headers);
-		PicOfDayEntity result =null;
-		try{
-			ResponseEntity<PicOfDayBean> response = client.exchange(url.toString(), HttpMethod.GET, entity, PicOfDayBean.class);
-			System.out.println();
-			System.out.println("Response from Nasa site: " + response.toString());
-			PicOfDayEntity picOfDay= mapper.map(response.getBody());
-			result  =this.saveTodaysPic(picOfDay);
-			System.out.println("Entity id is "+ picOfDay.getId());
+		HttpEntity<?> entity = new HttpEntity<>(headers);
+		PicOfDayEntity result = null;
+		try {
+			ResponseEntity<PicOfDayBean> response = client.exchange(uri, HttpMethod.GET, entity, PicOfDayBean.class);
 
-
+			LOGGER.info("Response from Nasa site: {}", response);
+			result =Optional.ofNullable(response.getBody())
+					.map(mapper::map)
+					.orElseThrow(() -> {
+						LOGGER.error("NASA returned a null response");
+						return new PicOfDayServiceException("Empty Response received.");
+					});
 		}catch(ResourceAccessException e){
-			LOGGER.error("I/O Error in calling NASA API: [{}]",url,e);
+			LOGGER.error("I/O Error in calling NASA API: [{}]",uri,e);
 			throw new PicOfDayServiceException(e.getMessage());
 		}catch (HttpStatusCodeException e){
-			LOGGER.error("Error processing request from the NASA Server : [{}]",url,e);
+			LOGGER.error("Error processing request from the NASA Server : [{}]",uri,e);
 			throw new PicOfDayServiceException(e.getMessage());
 		}
 		return result;
@@ -77,11 +86,6 @@ public class PicOfDayService implements IPicOfDayService{
 		return picOfDayRepository.getPicOfDayByDate(currentDate);
 	}
 
-	
-	private PicOfDayEntity saveTodaysPic(PicOfDayEntity entity) {
-		return picOfDayRepository.save(entity);
-		
-	}
 
 	@Override
 	public PicOfDayEntity getPicByDate(Date date) {
