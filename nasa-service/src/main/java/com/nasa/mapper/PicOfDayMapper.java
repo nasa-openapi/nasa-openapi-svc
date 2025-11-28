@@ -18,7 +18,6 @@ public class PicOfDayMapper implements Mapper<PicOfDayBean, PicOfDayEntity>{
 			.publishedDate(pubDate)
 			.title(dto.getTitle())
 			.url(dto.getUrl()).build();
-		System.out.println("Entity created: "+ result.toString());
 		return result;
 	}
 

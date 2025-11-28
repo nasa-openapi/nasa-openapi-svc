@@ -4,6 +4,7 @@ import com.nasa.bean.PicOfDayBean;
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
 import com.nasa.mapper.PicOfDayMapper;
+import com.nasa.repository.LogEntityRepository;
 import com.nasa.repository.PicOfDayRepository;
 import com.nasa.service.IPicOfDayService;
 import com.nasa.util.DateUtil;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,10 +42,13 @@ public class PicOfDayService implements IPicOfDayService{
 	PicOfDayRepository picOfDayRepository;
 
 	@Autowired
+	LogEntityRepository logEntityRepository;
+
+	@Autowired
 	RestTemplate client;
 
 	@Override
-	public PicOfDayEntity fetchTodaysPic() throws DataAccessException {
+	public PicOfDayEntity fetchTodaysPic() {
 		PicOfDayEntity picOfDay = callNasaApi();
 		return picOfDayRepository.save(picOfDay);
 	}
@@ -71,11 +74,11 @@ public class PicOfDayService implements IPicOfDayService{
 						return new PicOfDayServiceException("Empty Response received.");
 					});
 		}catch(ResourceAccessException e){
-			LOGGER.error("I/O Error in calling NASA API: [{}]",uri,e);
-			throw new PicOfDayServiceException(e.getMessage());
+			LOGGER.error("Could not connect to NASA API: [{}]",uri,e);
+			throw new PicOfDayServiceException(e);
 		}catch (HttpStatusCodeException e){
-			LOGGER.error("Error processing request from the NASA Server : [{}]",uri,e);
-			throw new PicOfDayServiceException(e.getMessage());
+			LOGGER.error("Received a bad response from NASA: [{}]",uri,e);
+			throw new PicOfDayServiceException(e);
 		}
 		return result;
 	}
