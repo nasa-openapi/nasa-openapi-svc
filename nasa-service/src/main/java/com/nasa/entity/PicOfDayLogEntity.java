@@ -20,7 +20,7 @@ public class PicOfDayLogEntity {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @Column(name = "RUN_TIME", nullable = false)
+    @Column(name = "RUN_TIMESTAMP", nullable = false)
     private Instant runTime = Instant.now();
 
     @Column(name = "LOG_MESSAGE", length = 2048, nullable = false)
