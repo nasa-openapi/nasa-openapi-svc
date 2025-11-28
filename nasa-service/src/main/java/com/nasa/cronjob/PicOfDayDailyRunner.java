@@ -2,16 +2,16 @@ package com.nasa.cronjob;
 
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
+import com.nasa.service.IPicOfDayLogService;
 import com.nasa.service.IPicOfDayService;
-import com.nasa.service.impl.PicOfDayLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 /**
@@ -20,36 +20,35 @@ import java.time.LocalDateTime;
  * out to be handled using decorators
  */
 @Component
-@Profile("daily-job")
-public class PicOfDayDailyRunner implements CommandLineRunner {
+public class PicOfDayDailyRunner {
 
     @Autowired
     @Qualifier(IPicOfDayService.NAME)
     IPicOfDayService picOfDayService;
 
     @Autowired
-    PicOfDayLogService logService;
+    IPicOfDayLogService logService;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayDailyRunner.class);
 
 
-    @Override
-    public void run(String... args) throws Exception {
-        LocalDateTime today = LocalDateTime.now();
-        LOGGER.info("Kicking off daily run for day {}",today);
+    @Scheduled(cron = "0 30 04 * * ?", zone  = "Europe/London")
+    public void run() {
+        Instant now = Instant.now();
+        LOGGER.info("Kicking off daily run for day {}",now);
         try{
             PicOfDayEntity entity = picOfDayService.fetchTodaysPic();
-            logService.logSuccess("DAILY_RUNNER");
+            logService.logSuccess("DAILY_RUNNER", now);
         }catch (PicOfDayServiceException e){
-            logService.logError("DAILY_RUNNER",e.getMessage());
+            logService.logError("DAILY_RUNNER",e.getMessage(), now);
             throw e;
         } catch (Exception e){
             LOGGER.error("FATAL ERROR: UNKNOWN ERROR -- ",e);
-            logService.logError("DAILY_RUNNER",e.getMessage());
+            logService.logError("DAILY_RUNNER",e.getMessage(),now );
             throw e;
         }
-        LOGGER.info("Completed daily run for {}",today);
+        LOGGER.info("Completed daily run ");
 
     }
 }
