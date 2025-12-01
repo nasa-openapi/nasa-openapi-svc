@@ -33,7 +33,7 @@ public class PicOfDayDailyRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayDailyRunner.class);
 
 
-    @Scheduled(cron = "0 30 04 * * ?", zone  = "Europe/London")
+    @Scheduled(cron = "0 00 15 * * ?")
     public void run() {
         Instant now = Instant.now();
         LOGGER.info("Kicking off daily run for day {}",now);
