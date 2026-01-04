@@ -1,6 +1,11 @@
 spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:default}
+  push:
+    vapid:
+      public-key: "BGmR2oWmH4T2SyXwDmT4qPBfFWvXK86tDjte3ggbb9ufmdAIXFeTPX9NFqQe78dZipxL3TmuDYN13JyJbalyyYE"
+      private-key: "5xvT4ECuPGlKgsvVd8p4-_8s6fO_QQyP30-V_kFmJfg"
+      subject: "mailto:abhijithsathyendran@gmail.com"
   application:
     name: nasa-openapi-svc
   jackson:
