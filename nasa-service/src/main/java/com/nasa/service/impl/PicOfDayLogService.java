@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+/**
+ * Logger Service for daily run
+ */
 @Service
 public class PicOfDayLogService implements IPicOfDayLogService {
 
