@@ -34,7 +34,7 @@ public class NotificationServiceTest {
 
     private static final String PUBLIC_KEY = "BPbBYcMcV7YY5dGNTUjkzUAxXuCDfLloTl4vCQ9xGzgxKlLVCig8-zHnUY-z-_KjLJWbhQBQdfFP-d3UcIkFcT0";
 
-    private static final String AUTH = "X22hmSkQ1GFXdGzglPFdQQ";
+    private static final String AUTH = "X22hmSkQ1GFXdGzglPFdQQ";    //ggignore
 
     private static final String ENDPOINT = "https://fcm.googleapis.com/fcm/send/sample-endpoint";
 
