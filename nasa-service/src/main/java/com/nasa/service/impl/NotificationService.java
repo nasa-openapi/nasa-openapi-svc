@@ -18,6 +18,9 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Send push notification about daily image update to subscribers
+ */
 @Service
 public class NotificationService implements INotificationService {
 
