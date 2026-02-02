@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -34,7 +33,7 @@ public class NotificationService implements INotificationService {
 
     @Override
     public void sendNotification() {
-        List<PushSubscriptionEntity> subscriptions=new ArrayList<>();
+        List<PushSubscriptionEntity> subscriptions;
         try{
             subscriptions = pushSubscriptionRepository
                     .findAll();
@@ -59,7 +58,7 @@ public class NotificationService implements INotificationService {
                 String fcmId = response.getFirstHeader("Location")!=null?
                         response.getFirstHeader("Location").getValue():"N/A";
                 if (status == 200|| status == 201) {
-                    LOGGER.debug("Push success Subscriber: {} with status: {}",entity.getSubscriber(), status);
+                    LOGGER.debug("Push success to Subscriber: {} with status: {}",entity.getSubscriber(), status);
                 } else {
                     LOGGER.error("Failed to send push to subscriber: {}, TraceID: {}, endpoint: {},  Status: {}, Reason: {}",
                             entity.getSubscriber(),
