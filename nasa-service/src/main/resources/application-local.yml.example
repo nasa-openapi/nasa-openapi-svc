@@ -1,9 +1,9 @@
 spring:
   push:
     vapid:
-      public-key: ${VAPID_PUBLIC_KEY}
-      private-key: ${VAPID_PRIVATE_KEY}
-      subject: ${VAPID_SUBJECT}
+      public-key: "COPY_FROM_HEROKU"
+      private-key: "COPY_FROM_HEROKU"
+      subject: "COPY_FROM_HEROKU"
   application:
     name: nasa-openapi-svc
   jackson:
@@ -18,6 +18,6 @@ spring:
     enabled: true
   datasource:
     driverClassName: org.postgresql.Driver
-    url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/NasaDB?currentSchema=NasaDB
+    username: postgres
+    password: password
