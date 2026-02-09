@@ -35,7 +35,7 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
-    public void sendNotification() {
+    public void sendNotification(String caption) {
         List<PushSubscriptionEntity> subscriptions;
         try{
             subscriptions = pushSubscriptionRepository
@@ -46,16 +46,12 @@ public class NotificationService implements INotificationService {
         }
         for (PushSubscriptionEntity entity : subscriptions) {
             try {
-
-
-                String payload = "Check out Astronomy Picture of the Day!!";
                 Notification notification = new Notification(
                         entity.getEndpoint(),
                         entity.getPublicKey(),
                         entity.getAuthSecret(),
-                        payload.getBytes(StandardCharsets.UTF_8)
+                        caption.getBytes(StandardCharsets.UTF_8)
                 );
-
                 HttpResponse response = pushService.send(notification);
                 int status = response.getStatusLine().getStatusCode();
                 String fcmId = response.getFirstHeader("Location")!=null?
@@ -70,8 +66,6 @@ public class NotificationService implements INotificationService {
                             response.getStatusLine().getStatusCode(),
                             response.getStatusLine().getReasonPhrase());
                 }
-
-
             } catch (GeneralSecurityException | IOException | JoseException | ExecutionException |
                      InterruptedException e) {
                 String id = entity.getSubscriber()!=null?entity.getSubscriber():entity.getId().toString();

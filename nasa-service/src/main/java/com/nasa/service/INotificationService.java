@@ -6,5 +6,5 @@ import java.security.spec.InvalidKeySpecException;
 
 public interface INotificationService {
 
-    void sendNotification();
+    void sendNotification(String caption);
 }

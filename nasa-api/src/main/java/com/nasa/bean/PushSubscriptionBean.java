@@ -1,28 +1,23 @@
 package com.nasa.bean;
 
-public class PushSubscriptionBean {
+import lombok.*;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class PushSubscriptionBean { // PUBLIC parent
 
     private String endpoint;
     private Keys keys;
+    private String name;
 
-    public static class Keys {
-        private String p256dh;
-        private String auth;
-
-        // Getters / setters
-        public String getP256dh() { return p256dh; }
-        public void setP256dh(String p256dh) { this.p256dh = p256dh; }
-
-        public String getAuth() { return auth; }
-        public void setAuth(String auth) { this.auth = auth; }
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Keys { // PUBLIC STATIC inner class
+        private String p256dh; // PRIVATE fields
+        private String auth;   // PRIVATE fields
     }
-
-    // Getters / setters
-    public String getEndpoint() { return endpoint; }
-    public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
-
-    public Keys getKeys() { return keys; }
-    public void setKeys(Keys keys) { this.keys = keys; }
-
 }
