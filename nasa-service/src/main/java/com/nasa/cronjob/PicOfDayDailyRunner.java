@@ -2,8 +2,10 @@ package com.nasa.cronjob;
 
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
+import com.nasa.service.INotificationService;
 import com.nasa.service.IPicOfDayLogService;
 import com.nasa.service.IPicOfDayService;
+import com.nasa.worker.NotificationWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.concurrent.Executor;
 
 /**
  * Daily running cron job to pull in images from NASA
@@ -29,6 +32,13 @@ public class PicOfDayDailyRunner {
     @Autowired
     IPicOfDayLogService logService;
 
+    @Autowired
+    @Qualifier("notificationThread")
+    Executor notificationExecutor;
+
+    @Autowired
+    INotificationService notificationService;
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayDailyRunner.class);
 
@@ -40,6 +50,14 @@ public class PicOfDayDailyRunner {
         try{
             PicOfDayEntity entity = picOfDayService.fetchTodaysPic();
             logService.logSuccess("DAILY_RUNNER", now);
+            String caption = entity.getTitle()==null? "Gaze up the stars!": entity.getTitle();
+            notificationExecutor.execute(()->{
+               try{
+                   notificationService.sendNotification(caption);
+               }catch(Exception e){
+                   LOGGER.error("Error while sending notifications");
+               }
+            });
         }catch (PicOfDayServiceException e){
             logService.logError("DAILY_RUNNER",e.getMessage(), now);
             throw e;

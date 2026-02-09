@@ -65,7 +65,7 @@ public class NotificationServiceTest {
         when(pushService.send(any(Notification.class))).thenReturn(mockResponse);
 
         // Act
-        notificationService.sendNotification();
+        notificationService.sendNotification("Testing");
 
         // Assert
         verify(pushService, times(1)).send(any(Notification.class));
@@ -78,7 +78,7 @@ public class NotificationServiceTest {
         when(repository.findAll()).thenThrow(new DataAccessException("DB Down") {});
 
         // Act
-        notificationService.sendNotification();
+        notificationService.sendNotification("Testing");
 
         // Assert
         verifyNoInteractions(pushService);
@@ -105,7 +105,7 @@ public class NotificationServiceTest {
         when(pushService.send(any(Notification.class))).thenThrow(new IOException("something happened"));
 
         // Act
-        notificationService.sendNotification();
+        notificationService.sendNotification("Testing");
 
         // Assert
         verify(pushService, times(2)).send(any(Notification.class));
