@@ -14,7 +14,18 @@ A Spring Boot service designed to interact with NASA's OpenAPIs and manage Web P
 
 ## 🏃 Local Development Setup
 
-To keep the project secure and prevent "Secret Leak" alerts (like GitGuardian), we use a local profile that is ignored by Git.
+[asdf](https://asdf-vm.com/) can be used for setting up the JDK for dev.
+
+If java plugin is not installed run, Else skip to the next
+
+```bash
+asdf plugin-add java
+```
+Install java version
+
+```bash
+asdf install
+```
 
 ### 1. Setup Configuration
 Copy the template file to create your personal local configuration.
