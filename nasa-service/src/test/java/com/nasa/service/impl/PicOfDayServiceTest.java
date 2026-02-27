@@ -6,7 +6,10 @@ import com.nasa.mapper.PicOfDayMapper;
 import com.nasa.repository.PicOfDayRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
@@ -17,6 +20,7 @@ import java.net.URI;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class PicOfDayServiceTest {
 
     @Mock
@@ -24,6 +28,9 @@ class PicOfDayServiceTest {
 
     @Mock
     private PicOfDayRepository repository;
+
+    @Mock
+    private ApplicationEventPublisher publisher;
 
     @InjectMocks
     private PicOfDayService service;

@@ -45,23 +45,13 @@ public class TestController {
     IPicOfDayService picOfDayService;
 
     @Autowired
-    @Qualifier("notificationThread")
-    Executor notificationExecutor;
-
-    @Autowired
     INotificationService notificationService;
 
     @GetMapping("sendNotification")
     public void sendNotification() throws GeneralSecurityException, JoseException, IOException, ExecutionException, InterruptedException {
         PicOfDayEntity today = picOfDayService.getTodaysPic();
         String caption = today.getTitle()==null? "Gaze up the stars!": today.getTitle();
-        notificationExecutor.execute(()->{
-            try{
-                notificationService.sendNotification(caption);
-            }catch(Exception e){
-                LOGGER.error("Error while sending notifications");
-            }
-        });
+        notificationService.sendNotification(caption);
 
     }
 
