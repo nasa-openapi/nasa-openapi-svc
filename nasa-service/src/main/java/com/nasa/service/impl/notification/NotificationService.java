@@ -1,4 +1,4 @@
-package com.nasa.service.impl;
+package com.nasa.service.impl.notification;
 
 import com.nasa.entity.PushSubscriptionEntity;
 import com.nasa.repository.PushSubscriptionRepository;
