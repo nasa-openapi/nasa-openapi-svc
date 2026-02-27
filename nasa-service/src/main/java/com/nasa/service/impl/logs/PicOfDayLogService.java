@@ -1,4 +1,4 @@
-package com.nasa.service.impl;
+package com.nasa.service.impl.logs;
 
 import com.nasa.entity.PicOfDayLogEntity;
 import com.nasa.repository.LogEntityRepository;

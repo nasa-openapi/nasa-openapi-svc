@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,6 +37,8 @@ public class PicOfDayService implements IPicOfDayService{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayService.class);
 
+	private final ApplicationEventPublisher publisher;
+
 	PicOfDayMapper mapper = new PicOfDayMapper();
 	
 	@Autowired
@@ -47,10 +50,19 @@ public class PicOfDayService implements IPicOfDayService{
 	@Autowired
 	RestTemplate client;
 
-	@Override
+    public PicOfDayService(ApplicationEventPublisher publisher, PicOfDayRepository repository, LogEntityRepository logEntityRepository) {
+        this.publisher = publisher;
+		this.picOfDayRepository = repository;
+		this.logEntityRepository = logEntityRepository;
+    }
+
+    @Override
 	public PicOfDayEntity fetchTodaysPic() {
 		PicOfDayEntity picOfDay = callNasaApi();
-		return picOfDayRepository.save(picOfDay);
+		PicOfDayEntity entitySaved = picOfDayRepository.save(picOfDay);
+		LOGGER.info("Entity with ID {} saved, publishing the event",entitySaved.getId() );
+		publisher.publishEvent(entitySaved);
+		return entitySaved;
 	}
 
 	private PicOfDayEntity callNasaApi(){
