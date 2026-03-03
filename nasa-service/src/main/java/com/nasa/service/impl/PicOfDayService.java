@@ -17,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
@@ -57,12 +58,11 @@ public class PicOfDayService implements IPicOfDayService{
     }
 
     @Override
+	@NonNull
 	public PicOfDayEntity fetchTodaysPic() {
 		PicOfDayEntity picOfDay = callNasaApi();
-		PicOfDayEntity entitySaved = picOfDayRepository.save(picOfDay);
-		LOGGER.info("Entity with ID {} saved, publishing the event",entitySaved.getId() );
-		publisher.publishEvent(entitySaved);
-		return entitySaved;
+		return picOfDayRepository.save(picOfDay);
+
 	}
 
 	private PicOfDayEntity callNasaApi(){

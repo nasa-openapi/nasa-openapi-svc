@@ -1,13 +1,15 @@
 package com.nasa.cronjob;
 
+import com.nasa.bean.PicOfDayTaskLogEvent;
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
 import com.nasa.service.IPicOfDayLogService;
 import com.nasa.service.IPicOfDayService;
+import com.nasa.status.PicOfDayTaskStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,12 +23,20 @@ import java.time.Instant;
 @Component
 public class PicOfDayDailyRunner {
 
-    @Autowired
-    @Qualifier(IPicOfDayService.NAME)
-    IPicOfDayService picOfDayService;
 
-    @Autowired
-    IPicOfDayLogService logService;
+    private final IPicOfDayService picOfDayService;
+
+
+    private final IPicOfDayLogService logService;
+
+    private final ApplicationEventPublisher publisher;
+
+    public PicOfDayDailyRunner(@Qualifier(IPicOfDayService.NAME) IPicOfDayService picOfDayService,
+                               IPicOfDayLogService logService, ApplicationEventPublisher publisher){
+        this.picOfDayService = picOfDayService;
+        this.publisher = publisher;
+        this.logService = logService;
+    }
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayDailyRunner.class);
@@ -35,17 +45,23 @@ public class PicOfDayDailyRunner {
     @Scheduled(cron = "0 00 15 * * ?")
     public void run() {
         Instant now = Instant.now();
+        PicOfDayEntity entity = null;
+        String message = null;
+        PicOfDayTaskStatus status = null;
         LOGGER.info("Kicking off daily run for day {}",now);
         try{
-            PicOfDayEntity entity = picOfDayService.fetchTodaysPic();
-            logService.logSuccess("DAILY_RUNNER", now);
-        }catch (PicOfDayServiceException e){
-            logService.logError("DAILY_RUNNER",e.getMessage(), now);
+            entity = picOfDayService.fetchTodaysPic();
+            status = PicOfDayTaskStatus.SUCCESS;
+        }catch (Exception e){
+            status = PicOfDayTaskStatus.ERROR;
+            message = e.getMessage();
+            if (!(e instanceof PicOfDayServiceException )){
+                LOGGER.error("FATAL ERROR: UNKNOWN ERROR -- ",e);
+            }
             throw e;
-        } catch (Exception e){
-            LOGGER.error("FATAL ERROR: UNKNOWN ERROR -- ",e);
-            logService.logError("DAILY_RUNNER",e.getMessage(),now );
-            throw e;
+        } finally {
+            Integer entityID = entity ==null? null: entity.getId();
+            publisher.publishEvent(new PicOfDayTaskLogEvent("DAILY_RUNNER",message, entityID, now, status));
         }
         LOGGER.info("Completed daily run ");
 

@@ -2,17 +2,22 @@ package com.nasa.controller;
 
 import com.nasa.bean.ErrorResponseBean;
 import com.nasa.bean.PicOfDayResponseBean;
+import com.nasa.bean.PicOfDayTaskLogEvent;
 import com.nasa.entity.PicOfDayEntity;
+import com.nasa.exception.PicOfDayServiceException;
 import com.nasa.exception.ResourceNotFoundException;
 import com.nasa.mapper.PicOfDayResposeMapper;
 import com.nasa.service.IPicOfDayService;
+import com.nasa.status.PicOfDayTaskStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,22 +26,31 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.Date;
 
 @RestController
 @RequestMapping("/nasa/v1/picOfDay")
 public class PicOfDayController {
+
+	private final IPicOfDayService picOfDayService;
 	
-	RestTemplate client = new RestTemplate();
-	
-	@Autowired
-	@Qualifier(value = IPicOfDayService.NAME)
-	IPicOfDayService picOfDayService;
-	
-	PicOfDayResposeMapper responseMapper = new PicOfDayResposeMapper();
-	
+	private final PicOfDayResposeMapper responseMapper;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayController.class);
+
+	private final ApplicationEventPublisher publisher;
+
+	public PicOfDayController(@Qualifier(IPicOfDayService.NAME) IPicOfDayService picOfDayService,
+							  ApplicationEventPublisher publisher){
+		this.responseMapper = new PicOfDayResposeMapper();
+		this.picOfDayService = picOfDayService;
+		this.publisher = publisher;
+
+	}
+
+
 	@Operation(summary = "Get Pic of Day for a given day")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "For a given date param, return pic of day and its details",
@@ -66,12 +80,29 @@ public class PicOfDayController {
     })
 	@GetMapping("/saveTodaysPic")
 	public ResponseEntity<PicOfDayResponseBean> saveTodaysPic(){
-		PicOfDayEntity entity =picOfDayService.fetchTodaysPic();
-		PicOfDayResponseBean responseBean = responseMapper.map(entity);
-		return ResponseEntity.status(HttpStatus.CREATED)
-        		.contentType(MediaType.APPLICATION_JSON)
-        		.body(responseBean);
-			
+		PicOfDayEntity entity=null;
+		PicOfDayTaskStatus status=null;
+		String message=null;
+		Instant runAt = Instant.now();
+		try{
+			entity = picOfDayService.fetchTodaysPic();
+			status = PicOfDayTaskStatus.SUCCESS;
+			PicOfDayResponseBean responseBean = responseMapper.map(entity);
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.contentType(MediaType.APPLICATION_JSON)
+					.body(responseBean);
+		}catch(Exception e){
+			status = PicOfDayTaskStatus.ERROR;
+			message = e.getMessage();
+			if(!(e instanceof PicOfDayServiceException)){
+				LOGGER.error("FATAL ERROR: UNKNOWN ERROR -- ",e);
+			}
+			throw e;
+		}finally {
+			Integer entityID = entity ==null? null: entity.getId();
+			publisher.publishEvent(new PicOfDayTaskLogEvent("API",message, entityID, runAt, status));
+		}
+
 	}
 
 	@Operation(summary = "Get today's Astronomy Picture of the Day")

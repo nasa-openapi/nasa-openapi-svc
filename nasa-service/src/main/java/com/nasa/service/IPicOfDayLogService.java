@@ -1,5 +1,7 @@
 package com.nasa.service;
 
+import com.nasa.bean.PicOfDayTaskLogEvent;
+
 import java.time.Instant;
 
 public interface IPicOfDayLogService {
@@ -20,4 +22,6 @@ public interface IPicOfDayLogService {
      * @param timestamp
      */
      void logError(String source, String message, Instant timestamp);
+
+     void logMessage(PicOfDayTaskLogEvent payload);
 }
