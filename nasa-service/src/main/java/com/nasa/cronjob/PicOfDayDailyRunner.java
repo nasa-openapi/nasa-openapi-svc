@@ -26,16 +26,13 @@ public class PicOfDayDailyRunner {
 
     private final IPicOfDayService picOfDayService;
 
-
-    private final IPicOfDayLogService logService;
-
     private final ApplicationEventPublisher publisher;
 
     public PicOfDayDailyRunner(@Qualifier(IPicOfDayService.NAME) IPicOfDayService picOfDayService,
-                               IPicOfDayLogService logService, ApplicationEventPublisher publisher){
+                               ApplicationEventPublisher publisher){
         this.picOfDayService = picOfDayService;
         this.publisher = publisher;
-        this.logService = logService;
+
     }
 
 
