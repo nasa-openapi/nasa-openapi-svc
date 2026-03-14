@@ -3,7 +3,6 @@ package com.nasa.cronjob;
 import com.nasa.bean.PicOfDayTaskLogEvent;
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
-import com.nasa.service.IPicOfDayLogService;
 import com.nasa.service.IPicOfDayService;
 import com.nasa.status.PicOfDayTaskStatus;
 import org.slf4j.Logger;
@@ -17,8 +16,7 @@ import java.time.Instant;
 
 /**
  * Daily running cron job to pull in images from NASA
- * Also handles the corresponding logging. Logging may need to be moved
- * out to be handled using decorators
+ * Publishes event upon completion.
  */
 @Component
 public class PicOfDayDailyRunner {
