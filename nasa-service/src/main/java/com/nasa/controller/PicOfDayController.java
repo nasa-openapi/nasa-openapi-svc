@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/nasa/v1/picOfDay")
@@ -60,14 +61,11 @@ public class PicOfDayController {
     })
 	@GetMapping("/getPicForDay")
 	public ResponseEntity<PicOfDayResponseBean> todaysPic(@RequestParam  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
-		PicOfDayEntity entity =  picOfDayService.getPicByDate(date);
-		if(entity == null) {
-			throw new ResourceNotFoundException("Could not find picture for the given day!");
-		}
-		PicOfDayResponseBean responseBean = responseMapper.map(entity);
-		return ResponseEntity.status(HttpStatus.ACCEPTED)
-        		.contentType(MediaType.APPLICATION_JSON)
-        		.body(responseBean);
+		return Optional.ofNullable(picOfDayService.getPicByDate(date))
+				.map(responseMapper::map)
+				.map(bean -> ResponseEntity.status(ACCEPTED)
+						.contentType(APPLICATION_JSON).body(bean))
+				.orElseThrow(()->new ResourceNotFoundException("Could not find picture for the given day!"));
 	}
 	
 	@Operation(summary = "Save Pic for today")
@@ -88,8 +86,8 @@ public class PicOfDayController {
 			entity = picOfDayService.fetchTodaysPic();
 			status = PicOfDayTaskStatus.SUCCESS;
 			PicOfDayResponseBean responseBean = responseMapper.map(entity);
-			return ResponseEntity.status(HttpStatus.CREATED)
-					.contentType(MediaType.APPLICATION_JSON)
+			return ResponseEntity.status(CREATED)
+					.contentType(APPLICATION_JSON)
 					.body(responseBean);
 		}catch(Exception e){
 			status = PicOfDayTaskStatus.ERROR;
@@ -117,14 +115,11 @@ public class PicOfDayController {
 	})
 	@GetMapping("/getTodaysPic")
 	public ResponseEntity<PicOfDayResponseBean> getTodaysPic(){
-		PicOfDayEntity entity = picOfDayService.getTodaysPic();
-		if(entity == null) {
-			throw new ResourceNotFoundException("Could not find picture for today!");
-		}
-		PicOfDayResponseBean responseBean = responseMapper.map(entity);
-		return ResponseEntity.status(HttpStatus.ACCEPTED)
-        		.contentType(MediaType.APPLICATION_JSON)
-        		.body(responseBean);
+		return Optional.ofNullable(picOfDayService.getTodaysPic())
+				.map(responseMapper::map)
+				.map((bean) ->
+						ResponseEntity.status(ACCEPTED).contentType(APPLICATION_JSON).body(bean))
+				.orElseThrow(()-> new PicOfDayServiceException("Could not find picture for today!"));
 	}
 
 
