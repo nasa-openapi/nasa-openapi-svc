@@ -119,7 +119,7 @@ public class PicOfDayController {
 				.map(responseMapper::map)
 				.map((bean) ->
 						ResponseEntity.status(ACCEPTED).contentType(APPLICATION_JSON).body(bean))
-				.orElseThrow(()-> new PicOfDayServiceException("Could not find picture for today!"));
+				.orElseThrow(()-> new ResourceNotFoundException("Could not find picture for today!"));
 	}
 
 
