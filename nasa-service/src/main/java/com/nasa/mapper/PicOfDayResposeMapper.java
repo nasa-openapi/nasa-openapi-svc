@@ -8,9 +8,10 @@ public class PicOfDayResposeMapper implements Mapper<PicOfDayEntity, PicOfDayRes
 	@Override
 	public PicOfDayResponseBean map(PicOfDayEntity entity) {
 		return PicOfDayResponseBean.builder()
-		.copyright(entity.getCopyright())
-		.explanation(entity.getExplanation())
-		.url(entity.getUrl()).build();
+				.copyright(entity.getCopyright())
+				.explanation(entity.getExplanation())
+				.title(entity.getTitle())
+				.url(entity.getUrl()).build();
 	}
 
 }
