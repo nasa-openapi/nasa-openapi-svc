@@ -9,6 +9,9 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
   jpa:
+    properties:
+      hibernate:
+        default_schema: NasaDB
     hibernate:
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   flyway:
@@ -21,3 +24,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/NasaDB?currentSchema=NasaDB
     username: postgres
     password: password
+    hikari:
+        schema: NasaDB
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

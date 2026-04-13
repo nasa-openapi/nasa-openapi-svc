@@ -13,6 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,8 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 import static com.nasa.constants.PicOfDayConstants.*;
 
@@ -106,6 +109,15 @@ public class PicOfDayService implements IPicOfDayService{
 	public PicOfDayEntity getPicByDate(Date date) {
 		return picOfDayRepository.getPicOfDayByDate(date);
 		
+	}
+
+	@Override
+	public Slice<PicOfDayEntity> search(String words, int pageNumber){
+		Pageable page = PageRequest.of(pageNumber,10);
+		return Optional.ofNullable(words)
+				.filter(a -> !a.trim().isEmpty())
+				.map(a-> picOfDayRepository.search(a,PageRequest.of(pageNumber,10)))
+				.orElse(new SliceImpl<>(Collections.emptyList()));
 	}
 	
 	

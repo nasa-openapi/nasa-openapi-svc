@@ -9,6 +9,9 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
   jpa:
+    properties:
+      hibernate:
+        default_schema: NasaDB
     hibernate:
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   flyway:
@@ -21,3 +24,9 @@ spring:
     url: ${DATABASE_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      schema: NasaDB
+logging:
+  level:
+    root: WARN
+    org.hibernate.SQL: ERROR

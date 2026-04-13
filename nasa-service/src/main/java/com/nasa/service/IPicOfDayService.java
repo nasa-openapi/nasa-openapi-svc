@@ -1,8 +1,10 @@
 package com.nasa.service;
 
 import java.util.Date;
+import java.util.List;
 
 import com.nasa.entity.PicOfDayEntity;
+import org.springframework.data.domain.Slice;
 
 public interface IPicOfDayService {
 	
@@ -26,5 +28,7 @@ public interface IPicOfDayService {
 	 * @return picture for the date param
 	 */
 	PicOfDayEntity getPicByDate(Date date);
+
+	Slice<PicOfDayEntity> search(String words, int pageNumber);
 
 }

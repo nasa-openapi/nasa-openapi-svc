@@ -3,6 +3,7 @@ package com.nasa.controller;
 import com.nasa.bean.ErrorResponseBean;
 import com.nasa.bean.PicOfDayResponseBean;
 import com.nasa.bean.PicOfDayTaskLogEvent;
+import com.nasa.bean.SearchResponse;
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
 import com.nasa.exception.ResourceNotFoundException;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Slice;
 import org.springframework.format.annotation.DateTimeFormat;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.*;
@@ -28,8 +30,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/nasa/v1/picOfDay")
@@ -120,6 +125,21 @@ public class PicOfDayController {
 				.map((bean) ->
 						ResponseEntity.status(ACCEPTED).contentType(APPLICATION_JSON).body(bean))
 				.orElseThrow(()-> new ResourceNotFoundException("Could not find picture for today!"));
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<SearchResponse> search(
+			@RequestParam String word,@RequestParam int pageNumber){
+		Slice<PicOfDayEntity> slices = picOfDayService.search(word,pageNumber);
+		List<PicOfDayResponseBean> picOfDayResponseBeans = slices.getContent().
+				stream().map(responseMapper::map).toList();
+		SearchResponse response= SearchResponse.builder()
+				.items(picOfDayResponseBeans)
+				.currentPage(slices.getNumber())
+				.hasMore(slices.hasNext())
+				.build();
+		return ResponseEntity.status(OK).body(response);
+
 	}
 
 
