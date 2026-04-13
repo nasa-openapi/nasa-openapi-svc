@@ -16,12 +16,14 @@ public interface PicOfDayRepository extends JpaRepository<PicOfDayEntity, Intege
 
     @Query(value = """
             SELECT * from "PicOfDay" WHERE 
-            search_vector @@ websearch_to_tsquery('english', :keywords) 
-            ORDER BY ts_rank(search_vector, websearch_to_tsquery('english', :keywords)) DESC
+            search_vector @@ to_tsquery('english', REPLACE(CAST(plainto_tsquery('english', :keywords) AS TEXT), '&','|')) 
+            ORDER BY 
+            ts_rank(search_vector, 
+            to_tsquery('english', REPLACE(CAST(plainto_tsquery('english', :keywords) AS TEXT), '&','|'))) DESC
             """,
             countQuery = """
-                    SELECT count(*) from "PicOfDay" WHERE
-                    search_vector @@ websearch_to_tsquery('english',:keywords)
+                    SELECT count(*) from "PicOfDay" WHERE 
+                    search_vector @@ to_tsquery('english', REPLACE(CAST(plainto_tsquery('english,' :keywords) AS TEXT), '&','|'))
                     """,
             nativeQuery = true)
     Slice<PicOfDayEntity> search(@Param("keywords") String keywords, Pageable page);
