@@ -3,6 +3,7 @@ package com.nasa.controller;
 import com.nasa.bean.ErrorResponseBean;
 import com.nasa.bean.PicOfDayResponseBean;
 import com.nasa.bean.PicOfDayTaskLogEvent;
+import com.nasa.bean.SearchResponse;
 import com.nasa.entity.PicOfDayEntity;
 import com.nasa.exception.PicOfDayServiceException;
 import com.nasa.exception.ResourceNotFoundException;
@@ -14,13 +15,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Slice;
 import org.springframework.format.annotation.DateTimeFormat;
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RestController
 @RequestMapping("/nasa/v1/picOfDay")
@@ -120,6 +125,21 @@ public class PicOfDayController {
 				.map((bean) ->
 						ResponseEntity.status(ACCEPTED).contentType(APPLICATION_JSON).body(bean))
 				.orElseThrow(()-> new ResourceNotFoundException("Could not find picture for today!"));
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<SearchResponse> search(
+			@RequestParam @NotBlank String word, @RequestParam int pageNumber){
+		Slice<PicOfDayEntity> slices = picOfDayService.search(word,pageNumber);
+		List<PicOfDayResponseBean> picOfDayResponseBeans = slices.getContent().
+				stream().map(responseMapper::map).toList();
+		SearchResponse response= SearchResponse.builder()
+				.items(picOfDayResponseBeans)
+				.currentPage(slices.getNumber())
+				.hasMore(slices.hasNext())
+				.build();
+		return ResponseEntity.status(OK).body(response);
+
 	}
 
 

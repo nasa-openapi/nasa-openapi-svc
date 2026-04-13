@@ -12,7 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,8 +39,6 @@ public class PicOfDayService implements IPicOfDayService{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayService.class);
 
-	private final ApplicationEventPublisher publisher;
-
 	PicOfDayMapper mapper = new PicOfDayMapper();
 	
 	@Autowired
@@ -51,8 +50,7 @@ public class PicOfDayService implements IPicOfDayService{
 	@Autowired
 	RestTemplate client;
 
-    public PicOfDayService(ApplicationEventPublisher publisher, PicOfDayRepository repository, LogEntityRepository logEntityRepository) {
-        this.publisher = publisher;
+    public PicOfDayService( PicOfDayRepository repository, LogEntityRepository logEntityRepository) {
 		this.picOfDayRepository = repository;
 		this.logEntityRepository = logEntityRepository;
     }
@@ -107,7 +105,9 @@ public class PicOfDayService implements IPicOfDayService{
 		return picOfDayRepository.getPicOfDayByDate(date);
 		
 	}
-	
-	
 
+	@Override
+	public Slice<PicOfDayEntity> search(String words, int pageNumber) {
+		return picOfDayRepository.search(words, PageRequest.of(pageNumber, 10));
+	}
 }
