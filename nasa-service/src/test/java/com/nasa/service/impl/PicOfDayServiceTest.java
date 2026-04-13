@@ -33,7 +33,7 @@ class PicOfDayServiceTest {
     private ApplicationEventPublisher publisher;
 
     @InjectMocks
-    private PicOfDayService service;
+    private PicOfDayService cut;
 
     private PicOfDayBean bean;
     private PicOfDayEntity entity;
@@ -59,7 +59,7 @@ class PicOfDayServiceTest {
                 .thenReturn(response);
         when(repository.save(any(PicOfDayEntity.class))).thenReturn(entity);
 
-        PicOfDayEntity result = service.fetchTodaysPic();
+        PicOfDayEntity result = cut.fetchTodaysPic();
 
         assertNotNull(result);
         assertEquals("Galaxy", result.getTitle());
@@ -72,7 +72,7 @@ class PicOfDayServiceTest {
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(PicOfDayBean.class)))
                 .thenReturn(response);
 
-        PicOfDayServiceException ex = assertThrows(PicOfDayServiceException.class, () -> service.fetchTodaysPic());
+        PicOfDayServiceException ex = assertThrows(PicOfDayServiceException.class, () -> cut.fetchTodaysPic());
         assertEquals("Empty Response received.", ex.getMessage());
     }
 
@@ -81,7 +81,7 @@ class PicOfDayServiceTest {
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(PicOfDayBean.class)))
                 .thenThrow(new ResourceAccessException("Connection timed out"));
 
-        assertThrows(PicOfDayServiceException.class, () -> service.fetchTodaysPic());
+        assertThrows(PicOfDayServiceException.class, () -> cut.fetchTodaysPic());
     }
 
     @Test
@@ -89,6 +89,6 @@ class PicOfDayServiceTest {
         when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(PicOfDayBean.class)))
                 .thenThrow(mock(HttpStatusCodeException.class));
 
-        assertThrows(PicOfDayServiceException.class, () -> service.fetchTodaysPic());
+        assertThrows(PicOfDayServiceException.class, () -> cut.fetchTodaysPic());
     }
 }

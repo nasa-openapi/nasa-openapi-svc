@@ -12,11 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,7 +26,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Date;
+import java.util.Optional;
 
 import static com.nasa.constants.PicOfDayConstants.*;
 
@@ -40,8 +38,6 @@ import static com.nasa.constants.PicOfDayConstants.*;
 public class PicOfDayService implements IPicOfDayService{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PicOfDayService.class);
-
-	private final ApplicationEventPublisher publisher;
 
 	PicOfDayMapper mapper = new PicOfDayMapper();
 	
@@ -54,8 +50,7 @@ public class PicOfDayService implements IPicOfDayService{
 	@Autowired
 	RestTemplate client;
 
-    public PicOfDayService(ApplicationEventPublisher publisher, PicOfDayRepository repository, LogEntityRepository logEntityRepository) {
-        this.publisher = publisher;
+    public PicOfDayService( PicOfDayRepository repository, LogEntityRepository logEntityRepository) {
 		this.picOfDayRepository = repository;
 		this.logEntityRepository = logEntityRepository;
     }
@@ -112,14 +107,7 @@ public class PicOfDayService implements IPicOfDayService{
 	}
 
 	@Override
-	public Slice<PicOfDayEntity> search(String words, int pageNumber){
-		Pageable page = PageRequest.of(pageNumber,10);
-		return Optional.ofNullable(words)
-				.filter(a -> !a.trim().isEmpty())
-				.map(a-> picOfDayRepository.search(a,PageRequest.of(pageNumber,10)))
-				.orElse(new SliceImpl<>(Collections.emptyList()));
+	public Slice<PicOfDayEntity> search(String words, int pageNumber) {
+		return picOfDayRepository.search(words, PageRequest.of(pageNumber, 10));
 	}
-	
-	
-
 }
